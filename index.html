@@ -3,168 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <title>법원직 민법 퀴즈</title>
-
 <style>
-body{
-    background:#f2f2f2;
-    font-family:Arial;
-    text-align:center;
-    padding:6px;
-    margin:0;
-}
-
-.box{
-    background:white;
-    width:96%;
-    max-width:900px;
-    margin:auto;
-    padding:32px 16px;
-    border-radius:26px;
-    box-shadow:0 2px 12px rgba(0,0,0,0.08);
-}
-
-video{
-    width:420px;
-    border-radius:26px;
-    max-width:96%;
-    background:#000;
-}
-
-button{
-    font-size:28px;
-    padding:18px 26px;
-    margin:10px;
-    border:none;
-    border-radius:18px;
-    background:#2f80ed;
-    color:white;
-    cursor:pointer;
-    width:90%;
-    max-width:430px;
-}
-
-.red{background:#e74c3c;}
-.gray{background:#777;}
-.green{background:#27ae60;}
-
-.question{
-    font-size:34px;
-    margin-top:26px;
-    line-height:1.7;
-    font-weight:bold;
-    word-break:keep-all;
-}
-
-#speech,
-#speechBox{
-    background:#fff4cc;
-    padding:18px;
-    border-radius:20px;
-    margin:18px 0;
-    font-weight:bold;
-    font-size:28px;
-    line-height:1.6;
-}
-
-#number,
-#score,
-#categoryText,
-#sourceText{
-    color:#777;
-    margin-top:12px;
-    font-size:24px;
-}
-
-#result{
-    margin-top:24px;
-    font-size:38px;
-    font-weight:bold;
-}
-
-#explanation{
-    margin-top:22px;
-    color:#555;
-    line-height:1.8;
-    font-size:28px;
-    text-align:left;
-    padding:0 10px;
-}
-
-#quizScreen,
-#finalScreen,
-#wrongNoteScreen{
-    display:none;
-}
-
-.wrongItem{
-    text-align:left;
-    background:#f7f7f7;
-    margin:12px;
-    padding:16px;
-    border-radius:16px;
-    line-height:1.7;
-    font-size:24px;
-}
-
-h1{
-    font-size:46px;
-    margin-bottom:22px;
-    line-height:1.25;
-}
-
-h2{
-    font-size:38px;
-}
-
+body{background:#f2f2f2;font-family:Arial;text-align:center;padding:6px;margin:0;}
+.box{background:white;width:96%;max-width:900px;margin:auto;padding:32px 16px;border-radius:26px;}
+video{width:420px;border-radius:26px;max-width:96%;background:#000;}
+button{font-size:28px;padding:18px 26px;margin:10px;border:none;border-radius:18px;background:#2f80ed;color:white;cursor:pointer;width:90%;max-width:430px;}
+.red{background:#e74c3c}.gray{background:#777}.green{background:#27ae60}
+.question{font-size:34px;margin-top:26px;line-height:1.7;font-weight:bold;word-break:keep-all;}
+#speech,#speechBox{background:#fff4cc;padding:18px;border-radius:20px;margin:18px 0;font-weight:bold;font-size:28px;line-height:1.6;}
+#number,#score,#categoryText,#sourceText{color:#777;margin-top:12px;font-size:24px;}
+#result{margin-top:24px;font-size:38px;font-weight:bold;}
+#explanation{margin-top:22px;color:#555;line-height:1.8;font-size:28px;text-align:left;padding:0 10px;}
+#quizScreen,#finalScreen,#wrongNoteScreen{display:none;}
+.wrongItem{text-align:left;background:#f7f7f7;margin:12px;padding:16px;border-radius:16px;line-height:1.7;font-size:24px;}
+h1{font-size:46px;margin-bottom:22px;line-height:1.25;}
+h2{font-size:38px;}
 @media (max-width:600px){
-    body{
-        padding:4px;
-    }
-
-    .box{
-        width:98%;
-        padding:28px 10px;
-        border-radius:22px;
-    }
-
-    h1{
-        font-size:46px;
-    }
-
-    video{
-        width:360px;
-    }
-
-    .question{
-        font-size:36px;
-        line-height:1.75;
-    }
-
-    button{
-        font-size:30px;
-        padding:18px 22px;
-        margin:10px;
-    }
-
-    #speech,
-    #speechBox{
-        font-size:28px;
-    }
-
-    #number,
-    #score,
-    #categoryText,
-    #sourceText{
-        font-size:24px;
-    }
-
-    #result{
-        font-size:38px;
-    }
-
-    #explanation{
-        font-size:28px;
-    }
+    .box{width:98%;padding:28px 10px;}
+    video{width:360px;}
+    .question{font-size:36px;}
+    button{font-size:30px;padding:18px 22px;}
 }
 </style>
 </head>
@@ -174,14 +32,17 @@ h2{
 <h1>법원직 민법 퀴즈</h1>
 
 <div id="startScreen">
-    <video autoplay muted loop playsinline>
+    <video id="startVideo" autoplay muted loop playsinline>
         <source src="teacher.mp4" type="video/mp4">
     </video>
 
     <div id="speech">문제 데이터를 불러오는 중입니다...</div>
 
-    <button class="green" onclick="turnVoiceOn()">음성 켜기</button>
-    <button class="gray" onclick="turnVoiceOff()">음성 끄기</button>
+    <button class="green" onclick="turnVideoSoundOn()">영상 소리 켜기</button>
+    <button class="gray" onclick="turnVideoSoundOff()">영상 소리 끄기</button>
+
+    <button class="green" onclick="turnVoiceOn()">문제 음성 켜기</button>
+    <button class="gray" onclick="turnVoiceOff()">문제 음성 끄기</button>
 
     <br>
 
@@ -221,7 +82,7 @@ h2{
 </div>
 
 <div id="finalScreen">
-    <video autoplay muted loop playsinline>
+    <video id="finalVideo" autoplay muted loop playsinline>
         <source src="correct.mp4" type="video/mp4">
     </video>
 
@@ -240,7 +101,6 @@ h2{
     <button class="red" onclick="clearWrongNote()">오답노트 삭제</button>
     <button onclick="goHome()">처음으로</button>
 </div>
-
 </div>
 
 <script>
@@ -251,24 +111,79 @@ let score = 0;
 let answered = false;
 let quizMode = "일반";
 let voiceOn = false;
+let videoSoundOn = false;
+let firstQuestionIntroPlayed = false;
 
 window.onload = function(){
     loadCSVAutomatically();
+    playVideoOnly("startVideo", false);
 };
 
-function changeVideo(fileName){
+function stopAllVideos(){
+    const videos = document.querySelectorAll("video");
+    videos.forEach(video => {
+        video.pause();
+        video.muted = true;
+        video.volume = 0;
+        video.currentTime = 0;
+    });
+}
+
+function playVideoOnly(videoId, sound){
+    stopAllVideos();
+
+    const video = document.getElementById(videoId);
+
+    if(video){
+        video.muted = !sound;
+        video.volume = sound ? 1 : 0;
+        video.play().catch(function(e){
+            console.log("재생 제한:", e);
+        });
+    }
+}
+
+function turnVideoSoundOn(){
+    videoSoundOn = true;
+
+    if(document.getElementById("startScreen").style.display !== "none"){
+        playVideoOnly("startVideo", true);
+    }else if(document.getElementById("quizScreen").style.display !== "none"){
+        playVideoOnly("teacherVideo", true);
+    }else if(document.getElementById("finalScreen").style.display !== "none"){
+        playVideoOnly("finalVideo", true);
+    }
+
+    alert("영상 소리가 켜졌습니다.");
+}
+
+function turnVideoSoundOff(){
+    videoSoundOn = false;
+
+    const videos = document.querySelectorAll("video");
+    videos.forEach(video => {
+        video.muted = true;
+        video.volume = 0;
+    });
+
+    alert("영상 소리가 꺼졌습니다.");
+}
+
+function changeVideo(fileName, sound){
     const video = document.getElementById("teacherVideo");
     const source = document.getElementById("videoSource");
 
-    if(!video || !source){
-        return;
-    }
+    if(!video || !source){ return; }
+
+    stopAllVideos();
 
     source.src = fileName;
     video.load();
+    video.muted = !sound;
+    video.volume = sound ? 1 : 0;
 
     video.play().catch(function(e){
-        console.log("자동재생 제한:", e);
+        console.log("재생 제한:", e);
     });
 }
 
@@ -287,14 +202,14 @@ function speak(text){
 
 function turnVoiceOn(){
     voiceOn = true;
-    speak("음성 안내를 시작합니다.");
-    alert("음성 안내가 켜졌습니다.");
+    speak("문제 음성 안내를 시작합니다.");
+    alert("문제 음성이 켜졌습니다.");
 }
 
 function turnVoiceOff(){
     voiceOn = false;
     window.speechSynthesis.cancel();
-    alert("음성 안내가 꺼졌습니다.");
+    alert("문제 음성이 꺼졌습니다.");
 }
 
 function loadCSVAutomatically(){
@@ -307,14 +222,12 @@ function loadCSVAutomatically(){
     })
     .then(text => {
         quizData = parseCSV(text);
-
         document.getElementById("speech").innerHTML =
         "문제 " + quizData.length + "개를 불러왔습니다. 영역을 선택하세요.";
     })
     .catch(error => {
         document.getElementById("speech").innerHTML =
         "문제 파일을 자동으로 불러오지 못했습니다.<br>questions.csv 파일명과 위치를 확인하세요.";
-
         alert("questions.csv 자동 로딩 실패");
     });
 }
@@ -325,10 +238,7 @@ function parseCSV(text){
 
     for(let i = 1; i < lines.length; i++){
         const line = lines[i].trim();
-
-        if(line === ""){
-            continue;
-        }
+        if(line === ""){ continue; }
 
         const row = line.split(",");
 
@@ -369,6 +279,7 @@ function startQuiz(category){
         return;
     }
 
+    firstQuestionIntroPlayed = false;
     speak(category + " 퀴즈를 시작합니다.");
     startSelectedQuiz();
 }
@@ -383,6 +294,7 @@ function startWrongQuiz(){
 
     quizMode = "오답노트";
     selectedQuiz = shuffle([...wrongNote]);
+    firstQuestionIntroPlayed = false;
 
     speak("오답노트 퀴즈를 시작합니다.");
     startSelectedQuiz();
@@ -404,7 +316,12 @@ function startSelectedQuiz(){
 function loadQuestion(){
     let q = selectedQuiz[currentQuestion];
 
-    changeVideo("teacher.mp4");
+    if(!firstQuestionIntroPlayed){
+        changeVideo("teacher.mp4", videoSoundOn);
+        firstQuestionIntroPlayed = true;
+    }else{
+        changeVideo("teacher.mp4", false);
+    }
 
     document.getElementById("speechBox").innerHTML = "문장을 끝까지 읽고 판단하세요.";
     document.getElementById("categoryText").innerHTML = "분야: " + q.category;
@@ -425,9 +342,7 @@ function loadQuestion(){
 }
 
 function checkAnswer(answer){
-    if(answered){
-        return;
-    }
+    if(answered){ return; }
 
     answered = true;
     let q = selectedQuiz[currentQuestion];
@@ -435,9 +350,8 @@ function checkAnswer(answer){
     if(answer === q.answer){
         score++;
         document.getElementById("result").innerHTML = "정답입니다!";
-        changeVideo("correct.mp4");
+        changeVideo("correct.mp4", videoSoundOn);
         document.getElementById("speechBox").innerHTML = "좋습니다. 정답입니다.";
-
         speak("정답입니다.");
 
         if(quizMode === "오답노트"){
@@ -446,9 +360,8 @@ function checkAnswer(answer){
 
     }else{
         document.getElementById("result").innerHTML = "오답입니다.";
-        changeVideo("wrong.mp4");
+        changeVideo("wrong.mp4", videoSoundOn);
         document.getElementById("speechBox").innerHTML = "오답입니다. 오답노트에 저장했습니다.";
-
         saveWrongQuestion(q);
         speak("오답입니다. 정답은 " + q.answer + "입니다. 해설을 확인하세요.");
     }
@@ -479,6 +392,8 @@ function showFinalScreen(){
     document.getElementById("quizScreen").style.display = "none";
     document.getElementById("finalScreen").style.display = "block";
 
+    playVideoOnly("finalVideo", videoSoundOn);
+
     document.getElementById("finalScore").innerHTML =
     "최종 점수: " + score + " / " + selectedQuiz.length;
 
@@ -502,6 +417,7 @@ function restartSameQuiz(){
     currentQuestion = 0;
     score = 0;
     answered = false;
+    firstQuestionIntroPlayed = false;
 
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("quizScreen").style.display = "block";
@@ -531,6 +447,8 @@ function showWrongNote(){
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("wrongNoteScreen").style.display = "block";
 
+    stopAllVideos();
+
     let wrongNote = JSON.parse(localStorage.getItem("wrongNote")) || [];
     let html = "";
 
@@ -553,7 +471,6 @@ function showWrongNote(){
 
 function clearWrongNote(){
     const ok = confirm("오답노트를 모두 삭제할까요?");
-
     if(ok){
         localStorage.removeItem("wrongNote");
         showWrongNote();
@@ -567,6 +484,9 @@ function goHome(){
     document.getElementById("quizScreen").style.display = "none";
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("wrongNoteScreen").style.display = "none";
+
+    firstQuestionIntroPlayed = false;
+    playVideoOnly("startVideo", videoSoundOn);
 }
 </script>
 
