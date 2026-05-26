@@ -118,28 +118,56 @@ let videoSoundOn = false;
 
 window.onload = function(){
     loadCSVAutomatically();
+    playVideoOnly("startVideo");
 };
 
-function applyVideoSound(){
+function stopAllVideos(){
     const videos = document.querySelectorAll("video");
     videos.forEach(video => {
+        video.pause();
+        video.muted = true;
+        video.volume = 0;
+        video.currentTime = 0;
+    });
+}
+
+function playVideoOnly(videoId){
+    stopAllVideos();
+
+    const video = document.getElementById(videoId);
+
+    if(video){
         video.muted = !videoSoundOn;
         video.volume = videoSoundOn ? 1 : 0;
         video.play().catch(function(e){
-            console.log("자동재생 제한:", e);
+            console.log("재생 제한:", e);
         });
-    });
+    }
 }
 
 function turnVideoSoundOn(){
     videoSoundOn = true;
-    applyVideoSound();
+
+    if(document.getElementById("startScreen").style.display !== "none"){
+        playVideoOnly("startVideo");
+    }else if(document.getElementById("quizScreen").style.display !== "none"){
+        playVideoOnly("teacherVideo");
+    }else if(document.getElementById("finalScreen").style.display !== "none"){
+        playVideoOnly("finalVideo");
+    }
+
     alert("영상 소리가 켜졌습니다.");
 }
 
 function turnVideoSoundOff(){
     videoSoundOn = false;
-    applyVideoSound();
+
+    const videos = document.querySelectorAll("video");
+    videos.forEach(video => {
+        video.muted = true;
+        video.volume = 0;
+    });
+
     alert("영상 소리가 꺼졌습니다.");
 }
 
@@ -149,13 +177,15 @@ function changeVideo(fileName){
 
     if(!video || !source){ return; }
 
+    stopAllVideos();
+
     source.src = fileName;
     video.load();
     video.muted = !videoSoundOn;
     video.volume = videoSoundOn ? 1 : 0;
 
     video.play().catch(function(e){
-        console.log("자동재생 제한:", e);
+        console.log("재생 제한:", e);
     });
 }
 
@@ -280,6 +310,7 @@ function startSelectedQuiz(){
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("quizScreen").style.display = "block";
 
+    playVideoOnly("teacherVideo");
     loadQuestion();
 }
 
@@ -357,12 +388,7 @@ function showFinalScreen(){
     document.getElementById("quizScreen").style.display = "none";
     document.getElementById("finalScreen").style.display = "block";
 
-    const finalVideo = document.getElementById("finalVideo");
-    if(finalVideo){
-        finalVideo.muted = !videoSoundOn;
-        finalVideo.volume = videoSoundOn ? 1 : 0;
-        finalVideo.play().catch(function(e){ console.log(e); });
-    }
+    playVideoOnly("finalVideo");
 
     document.getElementById("finalScore").innerHTML =
     "최종 점수: " + score + " / " + selectedQuiz.length;
@@ -391,6 +417,7 @@ function restartSameQuiz(){
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("quizScreen").style.display = "block";
 
+    playVideoOnly("teacherVideo");
     loadQuestion();
 }
 
@@ -415,6 +442,8 @@ function showWrongNote(){
     document.getElementById("quizScreen").style.display = "none";
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("wrongNoteScreen").style.display = "block";
+
+    stopAllVideos();
 
     let wrongNote = JSON.parse(localStorage.getItem("wrongNote")) || [];
     let html = "";
@@ -453,7 +482,7 @@ function goHome(){
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("wrongNoteScreen").style.display = "none";
 
-    applyVideoSound();
+    playVideoOnly("startVideo");
 }
 </script>
 
