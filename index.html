@@ -32,14 +32,11 @@ h2{font-size:38px;}
 <h1>법원직 민법 퀴즈</h1>
 
 <div id="startScreen">
-    <video id="startVideo" autoplay muted loop playsinline>
+    <video id="startVideo" autoplay loop playsinline>
         <source src="teacher.mp4" type="video/mp4">
     </video>
 
     <div id="speech">문제 데이터를 불러오는 중입니다...</div>
-
-    <button class="green" onclick="turnVideoSoundOn()">영상 소리 켜기</button>
-    <button class="gray" onclick="turnVideoSoundOff()">영상 소리 끄기</button>
 
     <button class="green" onclick="turnVoiceOn()">문제 음성 켜기</button>
     <button class="gray" onclick="turnVoiceOff()">문제 음성 끄기</button>
@@ -111,12 +108,10 @@ let score = 0;
 let answered = false;
 let quizMode = "일반";
 let voiceOn = false;
-let videoSoundOn = false;
-let firstQuestionIntroPlayed = false;
 
 window.onload = function(){
     loadCSVAutomatically();
-    playVideoOnly("startVideo", false);
+    playStartVideoOnceWithSound();
 };
 
 function stopAllVideos(){
@@ -129,47 +124,56 @@ function stopAllVideos(){
     });
 }
 
-function playVideoOnly(videoId, sound){
+function playStartVideoOnceWithSound(){
+    const startVideo = document.getElementById("startVideo");
+
+    if(!startVideo){ return; }
+
+    startVideo.loop = false;
+    startVideo.muted = false;
+    startVideo.volume = 1;
+    startVideo.currentTime = 0;
+
+    startVideo.play().catch(function(e){
+        console.log("첫 화면 소리 자동재생 제한:", e);
+
+        startVideo.muted = true;
+        startVideo.volume = 0;
+        startVideo.loop = true;
+        startVideo.play().catch(function(err){
+            console.log("무음 반복 재생 제한:", err);
+        });
+    });
+
+    startVideo.onended = function(){
+        startVideo.muted = true;
+        startVideo.volume = 0;
+        startVideo.loop = true;
+        startVideo.currentTime = 0;
+
+        startVideo.play().catch(function(err){
+            console.log("첫 화면 무음 반복 전환 제한:", err);
+        });
+    };
+}
+
+function playLoopMuted(videoId){
     stopAllVideos();
 
     const video = document.getElementById(videoId);
 
     if(video){
-        video.muted = !sound;
-        video.volume = sound ? 1 : 0;
+        video.loop = true;
+        video.muted = true;
+        video.volume = 0;
+        video.currentTime = 0;
         video.play().catch(function(e){
-            console.log("재생 제한:", e);
+            console.log("무음 반복 재생 제한:", e);
         });
     }
 }
 
-function turnVideoSoundOn(){
-    videoSoundOn = true;
-
-    if(document.getElementById("startScreen").style.display !== "none"){
-        playVideoOnly("startVideo", true);
-    }else if(document.getElementById("quizScreen").style.display !== "none"){
-        playVideoOnly("teacherVideo", true);
-    }else if(document.getElementById("finalScreen").style.display !== "none"){
-        playVideoOnly("finalVideo", true);
-    }
-
-    alert("영상 소리가 켜졌습니다.");
-}
-
-function turnVideoSoundOff(){
-    videoSoundOn = false;
-
-    const videos = document.querySelectorAll("video");
-    videos.forEach(video => {
-        video.muted = true;
-        video.volume = 0;
-    });
-
-    alert("영상 소리가 꺼졌습니다.");
-}
-
-function changeVideo(fileName, sound){
+function changeTeacherVideo(fileName, soundOnce){
     const video = document.getElementById("teacherVideo");
     const source = document.getElementById("videoSource");
 
@@ -179,11 +183,34 @@ function changeVideo(fileName, sound){
 
     source.src = fileName;
     video.load();
-    video.muted = !sound;
-    video.volume = sound ? 1 : 0;
+
+    if(soundOnce){
+        video.loop = false;
+        video.muted = false;
+        video.volume = 1;
+        video.currentTime = 0;
+
+        video.onended = function(){
+            source.src = "teacher.mp4";
+            video.load();
+            video.loop = true;
+            video.muted = true;
+            video.volume = 0;
+            video.currentTime = 0;
+            video.play().catch(function(e){
+                console.log("teacher 무음 전환 제한:", e);
+            });
+        };
+    }else{
+        video.loop = true;
+        video.muted = true;
+        video.volume = 0;
+        video.currentTime = 0;
+        video.onended = null;
+    }
 
     video.play().catch(function(e){
-        console.log("재생 제한:", e);
+        console.log("영상 재생 제한:", e);
     });
 }
 
@@ -279,7 +306,6 @@ function startQuiz(category){
         return;
     }
 
-    firstQuestionIntroPlayed = false;
     speak(category + " 퀴즈를 시작합니다.");
     startSelectedQuiz();
 }
@@ -294,7 +320,6 @@ function startWrongQuiz(){
 
     quizMode = "오답노트";
     selectedQuiz = shuffle([...wrongNote]);
-    firstQuestionIntroPlayed = false;
 
     speak("오답노트 퀴즈를 시작합니다.");
     startSelectedQuiz();
@@ -316,12 +341,7 @@ function startSelectedQuiz(){
 function loadQuestion(){
     let q = selectedQuiz[currentQuestion];
 
-    if(!firstQuestionIntroPlayed){
-        changeVideo("teacher.mp4", videoSoundOn);
-        firstQuestionIntroPlayed = true;
-    }else{
-        changeVideo("teacher.mp4", false);
-    }
+    changeTeacherVideo("teacher.mp4", false);
 
     document.getElementById("speechBox").innerHTML = "문장을 끝까지 읽고 판단하세요.";
     document.getElementById("categoryText").innerHTML = "분야: " + q.category;
@@ -350,7 +370,7 @@ function checkAnswer(answer){
     if(answer === q.answer){
         score++;
         document.getElementById("result").innerHTML = "정답입니다!";
-        changeVideo("correct.mp4", videoSoundOn);
+        changeTeacherVideo("correct.mp4", true);
         document.getElementById("speechBox").innerHTML = "좋습니다. 정답입니다.";
         speak("정답입니다.");
 
@@ -360,7 +380,7 @@ function checkAnswer(answer){
 
     }else{
         document.getElementById("result").innerHTML = "오답입니다.";
-        changeVideo("wrong.mp4", videoSoundOn);
+        changeTeacherVideo("wrong.mp4", true);
         document.getElementById("speechBox").innerHTML = "오답입니다. 오답노트에 저장했습니다.";
         saveWrongQuestion(q);
         speak("오답입니다. 정답은 " + q.answer + "입니다. 해설을 확인하세요.");
@@ -392,7 +412,7 @@ function showFinalScreen(){
     document.getElementById("quizScreen").style.display = "none";
     document.getElementById("finalScreen").style.display = "block";
 
-    playVideoOnly("finalVideo", videoSoundOn);
+    playLoopMuted("finalVideo");
 
     document.getElementById("finalScore").innerHTML =
     "최종 점수: " + score + " / " + selectedQuiz.length;
@@ -417,7 +437,6 @@ function restartSameQuiz(){
     currentQuestion = 0;
     score = 0;
     answered = false;
-    firstQuestionIntroPlayed = false;
 
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("quizScreen").style.display = "block";
@@ -485,8 +504,7 @@ function goHome(){
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("wrongNoteScreen").style.display = "none";
 
-    firstQuestionIntroPlayed = false;
-    playVideoOnly("startVideo", videoSoundOn);
+    playStartVideoOnceWithSound();
 }
 </script>
 
