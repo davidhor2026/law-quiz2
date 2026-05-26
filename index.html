@@ -38,11 +38,6 @@ h2{font-size:38px;}
 
     <div id="speech">문제 데이터를 불러오는 중입니다...</div>
 
-    <button class="green" onclick="turnVoiceOn()">문제 음성 켜기</button>
-    <button class="gray" onclick="turnVoiceOff()">문제 음성 끄기</button>
-
-    <br>
-
     <button onclick="startQuiz('전체')">전체 랜덤</button>
     <button onclick="startQuiz('민법총칙')">민법총칙</button>
     <button onclick="startQuiz('물권법')">물권법</button>
@@ -107,7 +102,6 @@ let currentQuestion = 0;
 let score = 0;
 let answered = false;
 let quizMode = "일반";
-let voiceOn = false;
 
 window.onload = function(){
     loadCSVAutomatically();
@@ -126,7 +120,6 @@ function stopAllVideos(){
 
 function playStartVideoOnceWithSound(){
     const startVideo = document.getElementById("startVideo");
-
     if(!startVideo){ return; }
 
     startVideo.loop = false;
@@ -135,14 +128,10 @@ function playStartVideoOnceWithSound(){
     startVideo.currentTime = 0;
 
     startVideo.play().catch(function(e){
-        console.log("첫 화면 소리 자동재생 제한:", e);
-
         startVideo.muted = true;
         startVideo.volume = 0;
         startVideo.loop = true;
-        startVideo.play().catch(function(err){
-            console.log("무음 반복 재생 제한:", err);
-        });
+        startVideo.play().catch(function(err){ console.log(err); });
     });
 
     startVideo.onended = function(){
@@ -150,16 +139,12 @@ function playStartVideoOnceWithSound(){
         startVideo.volume = 0;
         startVideo.loop = true;
         startVideo.currentTime = 0;
-
-        startVideo.play().catch(function(err){
-            console.log("첫 화면 무음 반복 전환 제한:", err);
-        });
+        startVideo.play().catch(function(err){ console.log(err); });
     };
 }
 
 function playLoopMuted(videoId){
     stopAllVideos();
-
     const video = document.getElementById(videoId);
 
     if(video){
@@ -167,9 +152,7 @@ function playLoopMuted(videoId){
         video.muted = true;
         video.volume = 0;
         video.currentTime = 0;
-        video.play().catch(function(e){
-            console.log("무음 반복 재생 제한:", e);
-        });
+        video.play().catch(function(e){ console.log(e); });
     }
 }
 
@@ -197,9 +180,7 @@ function changeTeacherVideo(fileName, soundOnce){
             video.muted = true;
             video.volume = 0;
             video.currentTime = 0;
-            video.play().catch(function(e){
-                console.log("teacher 무음 전환 제한:", e);
-            });
+            video.play().catch(function(e){ console.log(e); });
         };
     }else{
         video.loop = true;
@@ -209,42 +190,13 @@ function changeTeacherVideo(fileName, soundOnce){
         video.onended = null;
     }
 
-    video.play().catch(function(e){
-        console.log("영상 재생 제한:", e);
-    });
-}
-
-function speak(text){
-    if(!voiceOn){ return; }
-
-    window.speechSynthesis.cancel();
-
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = "ko-KR";
-    msg.rate = 1;
-    msg.pitch = 1;
-
-    window.speechSynthesis.speak(msg);
-}
-
-function turnVoiceOn(){
-    voiceOn = true;
-    speak("문제 음성 안내를 시작합니다.");
-    alert("문제 음성이 켜졌습니다.");
-}
-
-function turnVoiceOff(){
-    voiceOn = false;
-    window.speechSynthesis.cancel();
-    alert("문제 음성이 꺼졌습니다.");
+    video.play().catch(function(e){ console.log(e); });
 }
 
 function loadCSVAutomatically(){
     fetch("questions.csv?time=" + new Date().getTime(), {cache:"no-store"})
     .then(response => {
-        if(!response.ok){
-            throw new Error("questions.csv 파일을 찾을 수 없습니다.");
-        }
+        if(!response.ok){ throw new Error("questions.csv 파일을 찾을 수 없습니다."); }
         return response.text();
     })
     .then(text => {
@@ -306,7 +258,6 @@ function startQuiz(category){
         return;
     }
 
-    speak(category + " 퀴즈를 시작합니다.");
     startSelectedQuiz();
 }
 
@@ -320,8 +271,6 @@ function startWrongQuiz(){
 
     quizMode = "오답노트";
     selectedQuiz = shuffle([...wrongNote]);
-
-    speak("오답노트 퀴즈를 시작합니다.");
     startSelectedQuiz();
 }
 
@@ -357,8 +306,6 @@ function loadQuestion(){
     document.getElementById("explanation").innerHTML = "";
 
     answered = false;
-
-    speak("문제입니다. " + q.question);
 }
 
 function checkAnswer(answer){
@@ -372,7 +319,6 @@ function checkAnswer(answer){
         document.getElementById("result").innerHTML = "정답입니다!";
         changeTeacherVideo("correct.mp4", true);
         document.getElementById("speechBox").innerHTML = "좋습니다. 정답입니다.";
-        speak("정답입니다.");
 
         if(quizMode === "오답노트"){
             removeFromWrongNote(q);
@@ -383,7 +329,6 @@ function checkAnswer(answer){
         changeTeacherVideo("wrong.mp4", true);
         document.getElementById("speechBox").innerHTML = "오답입니다. 오답노트에 저장했습니다.";
         saveWrongQuestion(q);
-        speak("오답입니다. 정답은 " + q.answer + "입니다. 해설을 확인하세요.");
     }
 
     document.getElementById("score").innerHTML =
@@ -429,7 +374,6 @@ function showFinalScreen(){
     }
 
     document.getElementById("finalMessage").innerHTML = message;
-    speak("퀴즈가 완료되었습니다. 최종 점수는 " + score + "점입니다.");
 }
 
 function restartSameQuiz(){
@@ -497,14 +441,12 @@ function clearWrongNote(){
 }
 
 function goHome(){
-    window.speechSynthesis.cancel();
-
     document.getElementById("startScreen").style.display = "block";
     document.getElementById("quizScreen").style.display = "none";
     document.getElementById("finalScreen").style.display = "none";
     document.getElementById("wrongNoteScreen").style.display = "none";
 
-    playStartVideoOnceWithSound();
+    playLoopMuted("startVideo");
 }
 </script>
 
