@@ -38,6 +38,9 @@ h2{font-size:38px;}
 
     <div id="speech">문제 데이터를 불러오는 중입니다...</div>
 
+    <button class="green" onclick="turnVideoSoundOn()">동영상 음성 켜기</button>
+    <button class="gray" onclick="turnVideoSoundOff()">동영상 음성 끄기</button>
+
     <button onclick="startQuiz('전체')">전체 랜덤</button>
     <button onclick="startQuiz('민법총칙')">민법총칙</button>
     <button onclick="startQuiz('물권법')">물권법</button>
@@ -102,11 +105,33 @@ let currentQuestion = 0;
 let score = 0;
 let answered = false;
 let quizMode = "일반";
+let videoSoundEnabled = true;
 
 window.onload = function(){
     loadCSVAutomatically();
     playStartVideoOnceWithSound();
 };
+
+function turnVideoSoundOn(){
+    videoSoundEnabled = true;
+    alert("동영상 음성이 켜졌습니다.");
+
+    if(document.getElementById("startScreen").style.display !== "none"){
+        playStartVideoOnceWithSound();
+    }
+}
+
+function turnVideoSoundOff(){
+    videoSoundEnabled = false;
+
+    const videos = document.querySelectorAll("video");
+    videos.forEach(video => {
+        video.muted = true;
+        video.volume = 0;
+    });
+
+    alert("동영상 음성이 꺼졌습니다.");
+}
 
 function stopAllVideos(){
     const videos = document.querySelectorAll("video");
@@ -123,8 +148,8 @@ function playStartVideoOnceWithSound(){
     if(!startVideo){ return; }
 
     startVideo.loop = false;
-    startVideo.muted = false;
-    startVideo.volume = 1;
+    startVideo.muted = !videoSoundEnabled;
+    startVideo.volume = videoSoundEnabled ? 1 : 0;
     startVideo.currentTime = 0;
 
     startVideo.play().catch(function(e){
@@ -169,8 +194,8 @@ function changeTeacherVideo(fileName, soundOnce){
 
     if(soundOnce){
         video.loop = false;
-        video.muted = false;
-        video.volume = 1;
+        video.muted = !videoSoundEnabled;
+        video.volume = videoSoundEnabled ? 1 : 0;
         video.currentTime = 0;
 
         video.onended = function(){
